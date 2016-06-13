@@ -141,6 +141,16 @@ defmodule Bamboo.MandrillAdapterTest do
     assert message["important"] == true
   end
 
+  test "deliver/2 adds template parameters" do
+    email = new_email |> MandrillHelper.template("hello")
+
+    email |> MandrillAdapter.deliver(@config)
+
+    assert_receive {:fake_mandrill, %{params: %{"template_name" => template_name, "template_content" => template_content}}}
+    assert template_name == "hello"
+    assert template_content == []
+  end
+
   test "raises if the response is not a success" do
     email = new_email(from: "INVALID_EMAIL")
 
